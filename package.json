@@ -1,44 +1,47 @@
 {
-  "name": "arfunds",
-  "version": "1.1.13",
-  "description": "This library allows you to interact with Arweave funding pools for archival projects.",
+  "name": "@bundlr-network/hero-funds",
+  "version": "0.0.1",
+  "description": "This library allows you to interact with Arweave funding pools for Heroes of History.",
   "keywords": [
     "arweave",
-    "archive"
+    "archive",
+    "bundlr",
+    "heroes of history"
   ],
   "scripts": {
     "compile:node": "tsc --declaration -project tsconfig.json --outDir build",
     "compile:web": "npx browserify -p esmify ./tobundle.js -o ./umd/arfunds_bundle.js",
     "clean": "rm -rf build",
-    "copy": "cp -R src/contracts build", 
+    "copy": "cp -R src/contracts build",
     "build": "npm run clean && npm run compile:node && npm run compile:web && npm run copy",
     "deploy": "ts-node src/deployment/deploy.ts",
     "read": "ts-node src/deployment/read.ts",
     "contribute": "node src/deployment/contribute.js"
   },
-  "url": "https://github.com/abhavk/arfunds",
-  "author": "Abhav Kedia <abhavkedia@gmail.com> (https://github.com/abhavk)",
+  "url": "https://github.com/Bundlr-Network/hero-funds",
+  "author": "Bundlr Network",
   "dependencies": {
-    "arlocal": "1.1.30",
-    "arweave": "^1.10.23",
-    "browserify": "^17.0.0",
+    "arweave": "1.11.4",
     "gql-query-builder": "^3.6.0",
-    "node-cache": "^5.1.2",
-    "redstone-smartweave": "^0.5.7"
+    "warp-contracts": "^1.1.2"
   },
   "main": "build/library/Arfunds.js",
   "devDependencies": {
+    "@types/node": "^18.0.0",
+    "arlocal": "1.1.30",
+    "browserify": "^17.0.0",
     "esmify": "^2.1.1",
+    "node-cache": "^5.1.2",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.4"
   },
   "files": [
-	"umd/*",
-	"build/library/*",
-	"build/contracts/0.5.4/*"
-     ],
+    "umd/*",
+    "build/library/*",
+    "build/contracts/0.5.4/*"
+  ],
   "license": "ISC",
   "exclude": [
-	"build/library/*"
-	]
+    "build/library/*"
+  ]
 }
