@@ -1,7 +1,6 @@
 import { createPool } from "../library";
 import { readFileSync } from "fs"
 
-// const path = require("path");
 
 import Arweave from "arweave"
 

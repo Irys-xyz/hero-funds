@@ -10,10 +10,9 @@
   ],
   "scripts": {
     "compile:node": "tsc --declaration -project tsconfig.json --outDir build",
-    "compile:web": "npx browserify -p esmify ./tobundle.js -o ./umd/arfunds_bundle.js",
     "clean": "rm -rf build",
     "copy": "cp -R src/contracts build",
-    "build": "npm run clean && npm run compile:node && npm run compile:web && npm run copy",
+    "build": "yarn run clean && yarn run compile:node && yarn webpack && cp ./build/library/bundle.d.ts ././build/library/umd.bundle.d.ts",
     "deploy": "ts-node src/deployment/deploy.ts",
     "read": "ts-node src/deployment/read.ts",
     "contribute": "node src/deployment/contribute.js"
@@ -25,20 +24,28 @@
     "gql-query-builder": "^3.6.0",
     "warp-contracts": "^1.1.2"
   },
-  "main": "build/library/Arfunds.js",
+  "main": "build/library/index.js",
   "devDependencies": {
     "@types/node": "^18.0.0",
     "arlocal": "1.1.30",
     "browserify": "^17.0.0",
+    "constants-browserify": "^1.0.0",
+    "crypto-browserify": "^3.12.0",
+    "dts-bundle-webpack": "^1.0.2",
     "esmify": "^2.1.1",
+    "inspectpack": "^4.7.1",
     "node-cache": "^5.1.2",
+    "path-browserify": "^1.0.1",
+    "stream-browserify": "^3.0.0",
+    "ts-loader": "^9.3.0",
     "ts-node": "^10.7.0",
-    "typescript": "^4.6.4"
+    "typescript": "^4.6.4",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0"
   },
   "files": [
-    "umd/*",
     "build/library/*",
-    "build/contracts/0.5.4/*"
+    "build/contracts/*"
   ],
   "license": "ISC",
   "exclude": [
