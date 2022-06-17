@@ -1,17 +1,17 @@
-import  { query, mutation, subscription } from 'gql-query-builder';
+import { query } from 'gql-query-builder';
 
 
 export async function queryContracts(source, arweave) {
   const que = query({
     operation: 'transactions',
     variables: {
-        tags: {
-		value: {
-			name: "Contract-Src",
-			values: [source]
-		},
-		type: "[TagFilter!]"
-        }
+      tags: {
+        value: {
+          name: "Contract-Src",
+          values: [source]
+        },
+        type: "[TagFilter!]"
+      }
     },
     fields: [
       {
