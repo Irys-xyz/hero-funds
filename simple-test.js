@@ -1,10 +1,11 @@
 // File simple-demo.js
 
-const fs = require('fs');
-const path = require('path');
-const Arweave = require('arweave');
-const { SmartWeaveNodeFactory, LoggerFactory } = require("redstone-smartweave");
-const { default: ArLocal } = require("arlocal");
+
+import Arweave from "arweave";
+import { readFileSync } from "fs"
+import { join } from "path"
+import { WarpNodeFactory, LoggerFactory } from "warp-contracts"
+import Arlocal from "arlocal"
 const test = true;
 console.log(`Testing = ${test}`);
 
@@ -16,8 +17,7 @@ async function generateFundedWallet(arweave) {
 }
 
 async function generateEmptyWallet(arweave) {
-	const wallet = await arweave.wallets.generate();
-	return wallet;
+	return await arweave.wallets.generate();
 }
 
 (async () => {
@@ -29,7 +29,7 @@ async function generateEmptyWallet(arweave) {
 
 	if (test) {
 		// Set up ArLocal
-		const arLocal = new ArLocal(1985, false);
+		const arLocal = new Arlocal(1985, false);
 		await arLocal.start();
 
 		arweave = Arweave.init({
@@ -50,14 +50,14 @@ async function generateEmptyWallet(arweave) {
 
 	// Set up SmartWeave client
 	LoggerFactory.INST.logLevel('debug');
-	const smartweave = SmartWeaveNodeFactory.memCached(arweave);
+	const smartweave = WarpNodeFactory.memCached(arweave);
 
 	// contract definitions load
 	const destinationWallet = await generateEmptyWallet(arweave);
-	const contractSrc = fs.readFileSync(path.join(__dirname, "./src/contracts/0.4.84/contract.js"), "utf8");
+	const contractSrc = readFileSync(join(__dirname, "./src/contracts/0.4.84/contract.js"), "utf8");
 
 	// some magic to insert new wallet for testing
-	let initState = fs.readFileSync(path.join(__dirname, "./src/contracts/0.4.84/init.json"), "utf8");
+	let initState = readFileSync(join(__dirname, "./src/contracts/0.4.84/init.json"), "utf8");
 	const initJson = JSON.parse(initState);
 	const destAddress = await arweave.wallets.jwkToAddress(destinationWallet);
 	initJson.owner = destAddress;
@@ -119,7 +119,7 @@ async function generateEmptyWallet(arweave) {
 	console.log(JSON.stringify(state_2, null, 2));
 
 	// TEST 2.b: Read from different smartweave client
-	const fresh_smartweave = SmartWeaveNodeFactory.memCached(arweave);
+	const fresh_smartweave = WarpNodeFactory.memCached(arweave);
 	const fresh_interactor = fresh_smartweave.contract(contractTxId).connect(wallet);
 	const state_2b = await fresh_interactor.readState();
 	console.log("State after TEST 2.b");

@@ -1,11 +1,10 @@
 const path = require('path');
-const webpack = require("webpack");
 const { DuplicatesPlugin } = require("inspectpack/plugin");
 const DtsBundleWebpack = require('dts-bundle-webpack')
 
 const base = {
     entry: './src/library/index.ts',
-    devtool: 'source-map',
+    // devtool: 'source-map',
     mode: "production",
     module: {
         rules: [
@@ -28,32 +27,19 @@ const base = {
     },
     resolve: {
         extensions: ['.ts', '.js'],
-        // alias: {
-        //     // process: "process/browser",
-        //     // crypto: "crypto-browserify",
-        //     // stream: "stream-browserify",
-        // },
+
         fallback: {
-            // "crypto": require.resolve("crypto-browserify"),
-            // "assert": require.resolve("assert/"),
-            // "stream": require.resolve("stream-browserify"),
-            // "process": require.resolve("process/browser"),
-            // "util": require.resolve("util"),
-            // "events": require.resolve("events/"),
-            // "buffer": require.resolve('buffer/'),
-            // "zlib": require.resolve("browserify-zlib"),
             "crypto": require.resolve("crypto-browserify"),
             "path": require.resolve("path-browserify"),
             "constants": require.resolve("constants-browserify"),
             "stream": require.resolve("stream-browserify")
         }
-
-
     },
     plugins: [
         new DtsBundleWebpack({
             name: "@bundlr-network/hero-funds",
-            main: "./build/library/index.d.ts"
+            main: "./build/library/index.d.ts",
+            out: "./bundle.d.ts"
         }),
         new DuplicatesPlugin({
             emitErrors: false,
@@ -68,7 +54,7 @@ const mod = {
     externalsType: 'global',
     output: {
         filename: 'bundle.js',
-        path: path.resolve(__dirname, 'build/esm/'),
+        path: path.resolve(__dirname, 'build/library'),
         libraryTarget: "module",
         module: true
     },
@@ -80,7 +66,7 @@ const umd = {
     ...base,
     output: {
         filename: "umd.bundle.js",
-        path: path.resolve(__dirname, 'build/esm/'),
+        path: path.resolve(__dirname, 'build/library'),
         library: "HeroFunds",
         libraryTarget: "umd",
         globalObject: "globalThis",
