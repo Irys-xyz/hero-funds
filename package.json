@@ -1,6 +1,6 @@
 {
   "name": "@bundlr-network/hero-funds",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "This library allows you to interact with Arweave funding pools for Heroes of History.",
   "keywords": [
     "arweave",
@@ -22,6 +22,7 @@
   "dependencies": {
     "arweave": "1.11.4",
     "gql-query-builder": "^3.6.0",
+    "node-cache": "^5.1.2",
     "warp-contracts": "^1.1.2"
   },
   "main": "build/library/index.js",
@@ -34,7 +35,6 @@
     "dts-bundle-webpack": "^1.0.2",
     "esmify": "^2.1.1",
     "inspectpack": "^4.7.1",
-    "node-cache": "^5.1.2",
     "path-browserify": "^1.0.1",
     "stream-browserify": "^3.0.0",
     "ts-loader": "^9.3.0",
