@@ -37,11 +37,9 @@ export async function handle(state, action) {
 
 			if (existingBalance == BigInt(0)) {
 				// totalSupply==0 => existingBalance==0, but not other way round
-				// mint 100% of supply (1 M tokens)
-				state.totalSupply = "1000000";
+				// mint 100% of supply
 				state.tokens = {};
-				state.tokens[caller] = "1000000";
-
+				state.tokens[caller] = `${state.totalSupply}`;
 				addOrUpdateBigStrings(state.contributors, action.caller, contribution);
 				state.totalContributions = (BigInt(state.totalContributions) + contribution).toString();
 			} else {
