@@ -1,6 +1,6 @@
 {
   "name": "@bundlr-network/hero-funds",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "This library allows you to interact with Arweave funding pools for Heroes of History.",
   "keywords": [
     "arweave",
@@ -9,7 +9,7 @@
     "heroes of history"
   ],
   "scripts": {
-    "compile:node": "tsc --declaration -project tsconfig.json --outDir build & node ./build.js",
+    "compile:node": "tsc --declaration -project tsconfig.json --outDir build & node ./build.js && cp ./src/contracts/NFT/init.json ./build/contracts/NFT/init.json",
     "clean": "rm -rf build",
     "copy": "cp -R src/contracts build",
     "build": "yarn run clean && yarn run compile:node && yarn webpack && cp ./build/library/bundle.d.ts ././build/library/umd.bundle.d.ts",
@@ -49,11 +49,7 @@
     "webpack-cli": "^4.10.0"
   },
   "files": [
-    "build/library/*",
-    "build/contracts/*"
+    "build/*"
   ],
-  "license": "ISC",
-  "exclude": [
-    "build/library/*"
-  ]
+  "license": "ISC"
 }
