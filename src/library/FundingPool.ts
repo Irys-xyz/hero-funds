@@ -9,12 +9,11 @@ export default class FundingPool {
 	public poolId: string;
 	public cache: boolean;
 	public execution: ExecutionEngine;
-	public nftContract
+	public nftContract: string
 
 	// conditional variables
 	public contract: Contract;
-	public stateCache;
-	private stateLockAvailable: boolean;
+	public stateCache: NodeCache;
 
 	/**
 	* Constructs a new Funding Pool instance 
@@ -33,7 +32,6 @@ export default class FundingPool {
 		this.cache = localCache;
 		this.execution = executionEngine;
 		this.arweave = arweave;
-		this.stateLockAvailable = true;
 
 		if (this.execution == ExecutionEngine.REDSTONE) {
 			LoggerFactory.INST.logLevel("fatal");
@@ -86,79 +84,6 @@ export default class FundingPool {
 		return this.poolId;
 	}
 
-	allocate(state: any, toAllocate: number, sumContribution: bigint): void {
-		const commitFactor = Number(toAllocate) / Number(sumContribution);
-		let remainder = toAllocate % Object.keys(state.commit.contributors).length;
-		for (const key in state.commit.contributors) {
-
-			let newAllocation = Math.round(commitFactor * Number(state.commit.contributors[key]));
-			if (remainder > 0) {
-				newAllocation += 1;
-				remainder--;
-			}
-			this.addOrUpdateIntStrings(state.tokens, key, newAllocation);
-			this.addOrUpdateBigStrings(state.contributors, key, state.commit.contributors[key]);
-		}
-		state.totalContributions = (BigInt(state.totalContributions) + BigInt(sumContribution)).toString();
-	}
-
-	addOrUpdateBigStrings(object: Record<string, any>, key: string, qty: number | bigint): void {
-		if (object[key]) {
-			object[key] = (BigInt(object[key]) + BigInt(qty)).toString();
-		} else {
-			object[key] = qty.toString();
-		}
-	}
-
-	addOrUpdateIntStrings(object: Record<string, any>, key: string, qty: number): void {
-		if (object[key]) {
-			object[key] = (parseInt(object[key]) + qty).toString();
-		} else {
-			object[key] = qty.toString();
-		}
-	}
-
-
-
-	// public functions
-	async resolve(state): Promise<void> {
-		if (!state.commit) {
-			return;
-		}
-		const currentBlock = await this.arweave.api.get("/block/current");
-		const height = currentBlock.data.height;
-		if (height > state.commit.n) {
-			const totalSupply = parseInt(state.totalSupply);
-			// compute new contribution
-			let sumContribution = BigInt(0);
-			for (const key in state.commit.contributors) {
-				sumContribution += BigInt(state.commit.contributors[key]);
-			}
-			const existingBalance = BigInt(await this.getWalletBalanceAtHeight(state.owner, height)) - sumContribution;
-			if (existingBalance == BigInt(0)) {
-				// totalSupply==0 => existingBalance==0, but not other way round
-				// mint 100% of supply (1 M tokens)
-				state.totalSupply = "1000000";
-				state.tokens = {};
-				const toAllocate = 1000000;
-				this.allocate(state, toAllocate, sumContribution);
-			} else {
-
-				const mintedTokens = Math.round((Number(BigInt(1000000000000) * sumContribution / existingBalance) / 1000000000000) * Number(totalSupply));
-				const adjustmentFactor = Number(totalSupply) / Number(totalSupply + mintedTokens);
-				let sum = 0;
-				for (const key in state.tokens) {
-					const newAlloc = Math.round(state.tokens[key] * adjustmentFactor);
-					sum += newAlloc;
-					state.tokens[key] = newAlloc.toString();
-				}
-				const toAllocate = totalSupply - sum;
-				this.allocate(state, toAllocate, sumContribution);
-			}
-			delete state.commit;
-		}
-	}
-
 	async getWalletBalanceAtHeight(address: string, height: number): Promise<number> {
 		const balance = await this.arweave.api.get(`/block/height/${height}/wallet/${address}/balance`)
 		return +balance?.data;
@@ -170,31 +95,12 @@ export default class FundingPool {
 			const { state } = await this.contract.readState();
 			return state;
 		}
-
 		// if in cache, use that value
-		let currentState = this.stateCache.get("current");
+		const currentState = this.stateCache.get("current");
 		if (currentState == undefined) {
-			// critical section - use locks
-			while (!this.stateLockAvailable) {
-				await new Promise(resolve => setTimeout(resolve, 200));
-			}
-			currentState = this.stateCache.get("current");
-			if (currentState) {
-				return currentState;
-			} else {
-				try {
-					this.stateLockAvailable = false;
-					const { state } = await this.contract.readState();
-					await this.resolve(state);
-					this.stateCache.set("current", state);
-					this.stateLockAvailable = true;
-					return state;
-				} finally {
-					this.stateLockAvailable = true;
-				}
-			}
-		} else {
-			return currentState;
+			const { state } = await this.contract.readState();
+			this.stateCache.set("current", state);
+			return state;
 		}
 	}
 
@@ -228,16 +134,17 @@ export default class FundingPool {
 			// .000001 AR
 			winstonQty: amount
 		});
+		this.stateCache.del("current")
 		return interactionTx;
 	}
 
-	async commit(): Promise<string> {
-		const contractInteractor = this.contract.connect("use_wallet");
-		const interactionTx = await contractInteractor.writeInteraction({
-			function: "commit"
-		});
-		return interactionTx;
-	}
+	// async commit(): Promise<string> {
+	// 	const contractInteractor = this.contract.connect("use_wallet");
+	// 	const interactionTx = await contractInteractor.writeInteraction({
+	// 		function: "commit"
+	// 	});
+	// 	return interactionTx;
+	// }
 
 	async getOwnerBalance(): Promise<string> {
 		const [state, currentBlock] = await Promise.all([this.getInitState(), this.arweave.api.get("/block/current")]);
@@ -254,15 +161,6 @@ export default class FundingPool {
 	}
 
 	async getNftTags(projectName: string, artefactId: string, transferable = false, lockTime = 0): Promise<any> {
-		/**
-			  * Koi NFT params
-			  * App-Name: SmartWeaveContract
-			  * App-Version: 0.3.0
-			  * Action: marketplace/Create
-			  * Network: Koi
-			  * Contract-Src: tWSBznzm4ccTlgxRBUmbU-5nqMXtH9W4WhNHVeZS0q0
-			  * Init-State: { init state json }
-			  */
 		const tags = [];
 		const tokenHolder = await this.getRandomContributor();
 		const initialState = {
