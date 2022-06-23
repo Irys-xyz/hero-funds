@@ -1,12 +1,12 @@
 {
         "title": "Title of pool",
-        "useOfProceeds": "Description of pool information",
+        "description": "Description of pool information",
         "link": "(optional) link to the pool's website",
         "owner": "Wallet address for the pool",
-        "ownerInfo": "Information about the controller of the wallet in "owner"",
+        "ownerInfo": "Information about the controller of the wallet in 'owner'",
         "rewards": "Rewards for contributing to the pool",
         "contributors": {},
         "tokens": {},
-        "totalContributions": "Total amount of contributions (sum of "contributors" values)",
+        "totalContributions": "Total amount of contributions (sum of 'contributors' values)",
         "totalSupply": "Total supply of reward tokens"
 }

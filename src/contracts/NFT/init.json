@@ -1,0 +1,13 @@
+{
+    "title": "TwittAR Artefact",
+    "name": "Artefact 000000",
+    "description": "Minted from archiving pool ",
+    "ticker": "KOINFT",
+    "balances": {},
+    "owners": {},
+    "maxSupply": 1,
+    "contentType": "application/json",
+    "transferable": true,
+    "lockTime": 0,
+    "lastTransferTimestamp": null
+}
