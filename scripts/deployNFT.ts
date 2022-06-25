@@ -1,7 +1,6 @@
 import { SourceImpl } from "warp-contracts"
 import Arweave from "arweave"
 import { readFileSync } from "fs"
-import { join } from "path"
 
 async function main(): Promise<void> {
 	const arweave = Arweave.init({
@@ -11,8 +10,8 @@ async function main(): Promise<void> {
 	});
 	console.log("Deploying NFT contract source")
 	const src = new SourceImpl(arweave)
-	const wallet = JSON.parse(readFileSync("../wallets/wallet.json").toString())
-	const NFTSrc = readFileSync(join(__dirname, "../build/contracts/NFT/contract.js"), "utf8");
-	console.log(`Deployment: ${(await src.save({ src: NFTSrc }, wallet, true)).id}`)
+	const wallet = JSON.parse(readFileSync("./wallets/wallet.json").toString())
+	const NFTSrc = readFileSync("./build/contracts/NFT/contract.js", "utf8");
+	console.log(`Deployment: ${(await src.save({ src: NFTSrc }, wallet)).id}`)
 }
 main()

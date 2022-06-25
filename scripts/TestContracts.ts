@@ -1,11 +1,10 @@
 import Arweave from "arweave";
 import { readFileSync } from "fs"
 import { join } from "path"
-import { WarpNodeFactory, LoggerFactory, sleep, DefaultCreateContract, SourceImpl } from "warp-contracts"
-import Arlocal from "arlocal"
-import { FundingPool } from "../src/library"
+import { WarpNodeFactory, LoggerFactory, SourceImpl } from "warp-contracts"
+import { FundingPool, getAllArtefactsByPool } from "../src/library"
 
-import Axios from "axios"
+
 
 async function generateFundedWallet(arweave) {
 	const wallet = await arweave.wallets.generate();
@@ -264,6 +263,9 @@ async function runTests() {
 
 	console.log({ state: await nftContractInteractor.readState() })
 
+	const txs = await getAllArtefactsByPool(arweave, pool.getPoolId())
+
+	console.log({ txs })
 	console.log("done!")
 	// await stop()
 }

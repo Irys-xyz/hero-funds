@@ -15,6 +15,7 @@ export default class FundingPool {
 	// conditional variables
 	public contract: Contract;
 	public stateCache: NodeCache;
+	public artefactSeries: string
 
 	/**
 	* Constructs a new Funding Pool instance 
@@ -22,18 +23,20 @@ export default class FundingPool {
 
 	constructor(
 		{ poolId, arweave, nftContractSrc,
+			artefactSeries = "Heroes-Of-History",
 			localCache = false,
 			balanceUrl = "http://gateway-1.arweave.net:1984/",
 			executionEngine = ExecutionEngine.REDSTONE,
 			cacheInvalidation = 100
 		}:
-			{ localCache?: boolean, balanceUrl?: string, executionEngine?: ExecutionEngine, cacheInvalidation?: number, poolId: string, arweave: Arweave, nftContractSrc: string }
+			{ localCache?: boolean, balanceUrl?: string, executionEngine?: ExecutionEngine, cacheInvalidation?: number, poolId: string, arweave: Arweave, nftContractSrc: string, artefactSeries?: string }
 	) {
 		this.poolId = poolId;
 		this.cache = localCache;
 		this.execution = executionEngine;
 		this.arweave = arweave;
 		this.nftContractSrc = nftContractSrc
+		this.artefactSeries = artefactSeries
 
 		if (this.execution == ExecutionEngine.REDSTONE) {
 			LoggerFactory.INST.logLevel("fatal");
@@ -155,8 +158,9 @@ export default class FundingPool {
 		initialState.balances[tokenHolder] = initialState.maxSupply;
 		tags.push({ name: "Action", value: "marketplace/Create" });
 		tags.push({ name: "Network", value: "Koi" });
+		tags.push({ name: "Artefact-Series", value: this.artefactSeries })
 		tags.push({ name: "Pool-Id", value: this.getPoolId() })
-		// tags.push({ name: "Initial-Owner", value: tokenHolder })
+		tags.push({ name: "Initial-Owner", value: tokenHolder })
 		return { tags, initialState };
 	}
 

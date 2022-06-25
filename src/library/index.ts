@@ -1,6 +1,7 @@
+
 import Arweave from "arweave";
 import { JWKInterface } from "arweave/node/lib/wallet";
-import { query } from "gql-query-builder";
+import { query as Query } from "gql-query-builder";
 import { WarpNodeFactory } from "warp-contracts";
 export { default as FundingPool } from "./FundingPool"
 import initstate from "../contracts/pool/init.json"
@@ -54,7 +55,7 @@ export async function createPool(
 }
 
 export async function queryContracts(source, arweave): Promise<any[]> {
-    const que = query({
+    const query = Query({
         operation: "transactions",
         variables: {
             tags: {
@@ -78,7 +79,7 @@ export async function queryContracts(source, arweave): Promise<any[]> {
         ]
 
     })
-    const res = await arweave.api.post("/graphql", que);
+    const res = await arweave.api.post("/graphql", query);
     return res.data.data.transactions.edges;
 }
 
@@ -99,4 +100,95 @@ export function selectTokenHolder(tokens, totalSupply) {
     }
 
     throw new Error("Unable to select token holder");
+}
+
+
+// export async function getAllArtefactsByOwner(arweave: Arweave, owner: string, series = "Heroes-Of-History") {
+//     // const a = new ApolloClient({ uri: `htp://${arweave.api.config.host}/graphql`, cache: new InMemoryCache() })
+
+//     // const query = gql`
+//     // query Query() {
+//     //     transactions(tags: [{name: "Artefact-Series", values: [${series}]}], owners: [${owner}]) {
+//     //       edges {
+//     //         node {
+//     //           id
+//     //           owner {
+//     //             address
+//     //           }
+//     //         }
+//     //       }
+//     //     }
+//     //   }
+//     // `
+//     // const res = await a.query({ query })
+//     const query = Query({
+
+//         operation: "transactions",
+//         variables: {
+//             tags: {
+//                 values: [{
+//                     name: "Artefact-Series",
+//                     values: [series]
+//                 },
+//                 {
+//                     name: "Initial-Owner",
+//                     values: [owner]
+//                 },],
+//                 type: "[TagFilter!]"
+//             }
+//         },
+//         fields: [
+//             {
+//                 edges: [
+//                     {
+//                         node: [
+//                             "id"
+//                         ]
+//                     }
+//                 ]
+//             }
+//         ]
+
+//     })
+//     const res = await arweave.api.post("/graphql", query);
+//     return res.data.data.transactions.edges.map((node) => {
+//         return node.node.id
+//     })
+
+
+// }
+
+export async function getAllArtefactsByPool(arweave: Arweave, pool: string, /* series = "Heroes-Of-History" */) {
+
+    const query = Query({
+
+        operation: "transactions",
+        variables: {
+            tags: {
+                value: {
+                    name: "Pool-Id",
+                    values: [pool]
+                },
+                type: "[TagFilter!]"
+            }
+        },
+        fields: [
+            {
+                edges: [
+                    {
+                        node: [
+                            "id"
+                        ]
+                    }
+                ]
+            }
+        ]
+
+    })
+    const res = await arweave.api.post("/graphql", query);
+    return res.data.data.transactions.edges.map((node) => {
+        return node.node.id
+    })
+
+
 }

@@ -12,6 +12,6 @@ async function main(): Promise<void> {
 	const src = new SourceImpl(arweave)
 	const wallet = JSON.parse(readFileSync("./wallets/wallet.json").toString())
 	const poolSrc = readFileSync("./build/contracts/pool/contract.js", "utf8");
-	console.log(`Deployment: ${(await src.save({ src: poolSrc }, wallet, true)).id}`)
+	console.log(`Deployment: ${(await src.save({ src: poolSrc }, wallet)).id}`)
 }
 main()
