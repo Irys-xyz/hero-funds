@@ -10,23 +10,17 @@ export enum ExecutionEngine {
     NONE
 }
 
-export const APPROVED = [
-    "5Hoz9v0VgecpgHSeljNnZSWNEYff9JmZCIVyQmNpqEQ"
-];
-
 export async function createPool(
-    { arweave, title, description, wallet, owner, poolContract,
+    { arweave, wallet, poolContractSrc,
+        owner,
+        title,
+        description,
         link = "",
         ownerInfo = "",
-        rewards = "Transferable artefacts"
+        rewards = ""
     }:
-        { arweave: Arweave, title: string, description: string, wallet: JWKInterface, owner: string, poolContract: string, link: string, ownerInfo: string, rewards: string }
+        { arweave: Arweave, title: string, description: string, wallet: JWKInterface, owner: string, poolContractSrc: string, link: string, ownerInfo: string, rewards: string }
 ): Promise<string> {
-    const currentBlock = await arweave.api.get("/block/current");
-    const balance = await arweave.api.get(`/wallet_list/${currentBlock.data.wallet_list}/${owner}/balance`);
-    if (!(balance.data == "0")) {
-        throw new Error(`Archiving pool address (owner) must have 0 balance at the time of creation. Balance of provided address ${owner} is ${balance.data}`);
-    }
     const initJson = initstate
     initJson.title = title;
     initJson.description = description;
@@ -40,20 +34,22 @@ export async function createPool(
         {
             "name": "App-Type",
             "value": "Archiving-Pool-v1.0"
+        }, {
+            "name": "Pool-Name",
+            "value": title
         }
     ];
 
-    const smartweave = WarpNodeFactory.memCached(arweave);
+    const warp = WarpNodeFactory.memCached(arweave);
     // Deploying contract
-    console.log("Deployment started");
-    const contractTxId = await smartweave.createContract.deployFromSourceTx(
+
+    const contractTxId = await warp.createContract.deployFromSourceTx(
         {
             wallet,
             initState,
-            srcTxId: poolContract,
+            srcTxId: poolContractSrc,
             tags: customTags
         });
-    console.log(`Deployed pool ${contractTxId} with source tx ${poolContract}`);
     return contractTxId;
 }
 

@@ -1,10 +1,10 @@
 {
     "title": "TwittAR Artefact",
     "name": "Artefact 000000",
-    "description": "Minted from archiving pool ",
+    "description": "Minted from archiving pool HoH...",
     "ticker": "KOINFT",
     "balances": {},
-    "owners": {},
+    "owner": "",
     "maxSupply": 1,
     "contentType": "application/json",
     "transferable": true,

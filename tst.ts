@@ -1,7 +1,7 @@
 
 import Arweave from "arweave";
 import { readFileSync } from "fs";
-import { createPool, FundingPool } from "../src/library"
+import { createPool, FundingPool } from "./src/library"
 (async function () {
     const arweave = Arweave.init({
         host: "localhost",
@@ -23,4 +23,7 @@ import { createPool, FundingPool } from "../src/library"
     console.log(poolTx)
     const pool = new FundingPool({ arweave, nftContractSrc: "2uvbtiKk6fiseI5Do6AWBOvx2fTEF4twbRfhE5xhdXo", poolId: poolTx })
     console.log(pool)
+    const a = await pool.getContractSrc()
+    console.log(await pool.getAllPools())
+    console.log(a)
 })()

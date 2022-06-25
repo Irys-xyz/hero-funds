@@ -1,15 +1,16 @@
 import Arweave from "arweave";
 import { Contract, LoggerFactory, WarpNodeFactory } from "warp-contracts";
 import NodeCache from "node-cache";
-import { APPROVED, ExecutionEngine, queryContracts, selectTokenHolder } from ".";
+import { ExecutionEngine, queryContracts, selectTokenHolder } from ".";
 import { query } from "gql-query-builder";
 
 export default class FundingPool {
+
 	public arweave: Arweave;
 	public poolId: string;
 	public cache: boolean;
 	public execution: ExecutionEngine;
-	public nftContract: string
+	public nftContractSrc: string
 
 	// conditional variables
 	public contract: Contract;
@@ -20,18 +21,19 @@ export default class FundingPool {
 	*/
 
 	constructor(
-		{ poolId, arweave,
+		{ poolId, arweave, nftContractSrc,
 			localCache = false,
 			balanceUrl = "http://gateway-1.arweave.net:1984/",
 			executionEngine = ExecutionEngine.REDSTONE,
 			cacheInvalidation = 100
 		}:
-			{ localCache: boolean, balanceUrl: string, executionEngine: ExecutionEngine, cacheInvalidation: number, poolId: string, arweave: Arweave }
+			{ localCache?: boolean, balanceUrl?: string, executionEngine?: ExecutionEngine, cacheInvalidation?: number, poolId: string, arweave: Arweave, nftContractSrc: string }
 	) {
 		this.poolId = poolId;
 		this.cache = localCache;
 		this.execution = executionEngine;
 		this.arweave = arweave;
+		this.nftContractSrc = nftContractSrc
 
 		if (this.execution == ExecutionEngine.REDSTONE) {
 			LoggerFactory.INST.logLevel("fatal");
@@ -44,12 +46,7 @@ export default class FundingPool {
 
 	}
 
-	static async getApproved(): Promise<string[]> {
-		return APPROVED
-		// return await axios.get("hoh.bundlr.network/pools/approved")
-	}
-
-	async getNFTContract(): Promise<string> {
+	async getContractSrc(): Promise<string> {
 		const que = await query({
 			operation: "transaction",
 			variables: {
@@ -69,12 +66,13 @@ export default class FundingPool {
 	}
 
 
-	async getAllContracts(arweave, filterApproved = false): Promise<string[]> {
+	async getAllPools(filterApproved = false): Promise<string[]> {
 		if (filterApproved) {
-			return await FundingPool.getApproved();
+			// return await axios.get("hoh.bundlr.network/pools/approved")
+			return ["5Hoz9v0VgecpgHSeljNnZSWNEYff9JmZCIVyQmNpqEQ"]
 		}
-		const contractSrc = await this.getNFTContract()
-		const data = await queryContracts(contractSrc, arweave);
+		const contractSrc = await this.getContractSrc()
+		const data = await queryContracts(contractSrc, this.arweave);
 		const contracts: string[] = [];
 		data.forEach((edge) => contracts.push(edge.node.id));
 		return contracts;
@@ -84,10 +82,6 @@ export default class FundingPool {
 		return this.poolId;
 	}
 
-	async getWalletBalanceAtHeight(address: string, height: number): Promise<number> {
-		const balance = await this.arweave.api.get(`/block/height/${height}/wallet/${address}/balance`)
-		return +balance?.data;
-	}
 
 	// read current state, with caching
 	async getState(): Promise<any> {
@@ -138,55 +132,32 @@ export default class FundingPool {
 		return interactionTx;
 	}
 
-	// async commit(): Promise<string> {
-	// 	const contractInteractor = this.contract.connect("use_wallet");
-	// 	const interactionTx = await contractInteractor.writeInteraction({
-	// 		function: "commit"
-	// 	});
-	// 	return interactionTx;
-	// }
 
-	async getOwnerBalance(): Promise<string> {
-		const [state, currentBlock] = await Promise.all([this.getInitState(), this.arweave.api.get("/block/current")]);
-		const ownerAddress = state.owner;
-		const walletListHash = currentBlock.data.wallet_list;
-		const balance = await this.arweave.api.get(`/wallet_list/${walletListHash}/${ownerAddress}/balance`);
-		return balance.data;
-	}
-
-	async getMetadata(): Promise<any> {
-		const initState = await this.getInitState();
-		const metadata = ({ title, description, link, owner }) => { return { title, description, link, owner } };
-		return metadata(initState);
-	}
-
-	async getNftTags(projectName: string, artefactId: string, transferable = false, lockTime = 0): Promise<any> {
+	async getNftData(artefactId: string, transferable = null, lockTime = 0): Promise<any> {
 		const tags = [];
 		const tokenHolder = await this.getRandomContributor();
+		const projectName = (await this.getInitState()).title
 		const initialState = {
 			"title": `${projectName} Artefact`,
-			"name": `Artefact ${artefactId}`,
+			"name": `Artefact #${artefactId}`,
 			"description": `Minted from archiving pool ${this.getPoolId()}`,
 			"ticker": "KOINFT",
 			"balances": {},
-			"owners": {},
+			"owner": tokenHolder,
 			"maxSupply": 1,
 			"contentType": "application/json",
 			"transferable": transferable,
 			"lockTime": lockTime,
-			"lastTransferTimestamp": null
+			"lastTransferTimestamp": null,
+			"createdAt": new Date().getTime()
 		}
 
 		initialState.balances[tokenHolder] = 1;
-		initialState.owners["1"] = tokenHolder;
-		tags.push({ name: "App-Name", value: "SmartWeaveContract" });
-		tags.push({ name: "App-Version", value: "0.3.0" });
 		tags.push({ name: "Action", value: "marketplace/Create" });
 		tags.push({ name: "Network", value: "Koi" });
-		tags.push({ name: "Contract-Src", value: this.nftContract });
-		tags.push({ name: "Init-State", value: JSON.stringify(initialState) });
-		tags.push({ name: "Initial-Owner", value: tokenHolder })
-		return tags;
+		tags.push({ name: "Pool-Id", value: this.getPoolId() })
+		// tags.push({ name: "Initial-Owner", value: tokenHolder })
+		return { tags, initialState };
 	}
 
 }

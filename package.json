@@ -23,14 +23,16 @@
     "arweave": "1.11.4",
     "gql-query-builder": "^3.6.0",
     "node-cache": "^5.1.2",
-    "warp-contracts": "^1.1.2"
+    "warp-contracts": "^1.1.5"
   },
   "main": "build/library/index.js",
   "devDependencies": {
+    "@bundlr-network/client": "^0.7.14",
     "@types/node": "^18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "@typescript-eslint/parser": "^5.29.0",
-    "arlocal": "1.1.30",
+    "arlocal": "^1.1.44",
+    "axios": "^0.27.2",
     "browserify": "^17.0.0",
     "constants-browserify": "^1.0.0",
     "crypto-browserify": "^3.12.0",

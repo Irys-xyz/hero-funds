@@ -1,19 +1,18 @@
-
-
-import { DefaultCreateContract } from "warp-contracts"
+import { SourceImpl } from "warp-contracts"
 import Arweave from "arweave"
 import { readFileSync } from "fs"
+import { join } from "path"
+
 async function main(): Promise<void> {
 	const arweave = Arweave.init({
 		host: "arweave.net",
 		port: 443,
 		protocol: "https",
 	});
-	const deployer = new DefaultCreateContract(arweave)
-	const JWK = JSON.parse(readFileSync("").toString())
-	const initState = JSON.parse(readFileSync("../src/contracts/init.json").toString())
-	const src = readFileSync("../src/contracts/contract.js")
-	const deployRes = deployer.deploy({ src, wallet: JWK, initState })
-	console.log(deployRes)
+	console.log("Deploying NFT contract source")
+	const src = new SourceImpl(arweave)
+	const wallet = JSON.parse(readFileSync("../wallets/wallet.json").toString())
+	const NFTSrc = readFileSync(join(__dirname, "../build/contracts/NFT/contract.js"), "utf8");
+	console.log(`Deployment: ${(await src.save({ src: NFTSrc }, wallet)).id}`)
 }
 main()
