@@ -1,6 +1,6 @@
 {
   "name": "@bundlr-network/hero-funds",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "This library allows you to interact with Arweave funding pools for Heroes of History.",
   "keywords": [
     "arweave",
