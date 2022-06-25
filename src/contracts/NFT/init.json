@@ -4,7 +4,6 @@
     "description": "Minted from archiving pool HoH...",
     "ticker": "KOINFT",
     "balances": {},
-    "owner": "",
     "maxSupply": 100,
     "contentType": "application/json",
     "transferable": true,

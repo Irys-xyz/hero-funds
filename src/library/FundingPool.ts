@@ -143,7 +143,7 @@ export default class FundingPool {
 			"description": `Minted from archiving pool ${this.getPoolId()}`,
 			"ticker": "KOINFT",
 			"balances": {},
-			"owner": tokenHolder,
+			// "owner": tokenHolder,
 			"maxSupply": 100, //used to allow fractional shares without stepping into decimal territory
 			"contentType": "application/json",
 			"transferable": transferable,

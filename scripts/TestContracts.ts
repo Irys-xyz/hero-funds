@@ -232,8 +232,8 @@ async function runTests() {
 	await mine()
 	const wallet2Address = await arweave.wallets.getAddress(wallet2)
 	const wallets = [walletAddress, wallet2Address]
-	const dg = wallets.find(w => w != initialState.owner) as string;
-	const owner = initialState.owner
+	const owner = Object.entries(initialState.balances)[0][0]
+	const dg = wallets.find(w => w != owner) as string;
 	const ownerWall = walletAddress === owner ? wallet : wallet2
 	console.log(dg)
 
