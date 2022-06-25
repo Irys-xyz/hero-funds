@@ -201,7 +201,7 @@ async function runTests() {
 	console.log("Finished Pool contract tests!")
 	await mine();
 
-	const pool = new FundingPool({ arweave, poolId: contractTxId, balanceUrl: "http://localhost:1984", nftContract: NFTContractID })
+	const pool = new FundingPool({ arweave, poolId: contractTxId, balanceUrl: "http://localhost:1984", nftContractSrc: NFTContractID })
 
 	const { tags, initialState } = await pool.getNftData("1111111")
 
@@ -227,6 +227,7 @@ async function runTests() {
 		data: { "Content-Type": "application/x.arweave-manifest+json", body: JSON.stringify(manifest) },
 		tags
 	})
+	// this should use the bundlr for production environments
 
 	await mine()
 	const wallet2Address = await arweave.wallets.getAddress(wallet2)
@@ -247,7 +248,7 @@ async function runTests() {
 
 	await nftContractInteractor.writeInteraction({
 		function: "transfer",
-		target: dg, qty: 0.9
+		target: dg, qty: 90
 	});
 	await mine()
 	console.log({ state: await nftContractInteractor.readState() })

@@ -144,7 +144,7 @@ export default class FundingPool {
 			"ticker": "KOINFT",
 			"balances": {},
 			"owner": tokenHolder,
-			"maxSupply": 1,
+			"maxSupply": 100, //used to allow fractional shares without stepping into decimal territory
 			"contentType": "application/json",
 			"transferable": transferable,
 			"lockTime": lockTime,
@@ -152,7 +152,7 @@ export default class FundingPool {
 			"createdAt": new Date().getTime()
 		}
 
-		initialState.balances[tokenHolder] = 1;
+		initialState.balances[tokenHolder] = initialState.maxSupply;
 		tags.push({ name: "Action", value: "marketplace/Create" });
 		tags.push({ name: "Network", value: "Koi" });
 		tags.push({ name: "Pool-Id", value: this.getPoolId() })

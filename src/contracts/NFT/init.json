@@ -5,7 +5,7 @@
     "ticker": "KOINFT",
     "balances": {},
     "owner": "",
-    "maxSupply": 1,
+    "maxSupply": 100,
     "contentType": "application/json",
     "transferable": true,
     "lockTime": 0,

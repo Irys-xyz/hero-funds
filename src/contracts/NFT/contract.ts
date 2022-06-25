@@ -17,7 +17,8 @@ export function handle(state, action) {
         ContractAssert(target, "No target specified.");
         ContractAssert(caller !== target, "Invalid token transfer.");
         const qty = input.qty;
-        ContractAssert(qty && qty > 0, "No valid quantity specified.");
+        ContractAssert(qty && qty > 0 && Number.isInteger(qty), "No valid quantity specified.");
+
         const balances = state.balances;
         ContractAssert(caller in balances && balances[caller] >= qty, "Caller has insufficient funds");
 
@@ -48,7 +49,8 @@ export function handle(state, action) {
             result: {
                 target,
                 ticker,
-                balance: target in balances ? balances[target] : 0
+                balance: target in balances ? balances[target] / state.maxSupply : 0,
+                intBalance: target in balances ? balances[target] : 0
             }
         };
     }

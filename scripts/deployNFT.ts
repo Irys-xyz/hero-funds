@@ -13,6 +13,6 @@ async function main(): Promise<void> {
 	const src = new SourceImpl(arweave)
 	const wallet = JSON.parse(readFileSync("../wallets/wallet.json").toString())
 	const NFTSrc = readFileSync(join(__dirname, "../build/contracts/NFT/contract.js"), "utf8");
-	console.log(`Deployment: ${(await src.save({ src: NFTSrc }, wallet)).id}`)
+	console.log(`Deployment: ${(await src.save({ src: NFTSrc }, wallet, true)).id}`)
 }
 main()
