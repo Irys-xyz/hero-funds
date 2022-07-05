@@ -136,7 +136,7 @@ export default class FundingPool {
 	}
 
 
-	async getNftData(artefactId: string, transferable = null, lockTime = 0): Promise<any> {
+	async getNftData(artefactId: string, transferable = null, lockTime = 0): Promise<{ tags: { name: string, value: string }[], initState: Record<string, any> }> {
 		const tags = [];
 		const tokenHolder = await this.getRandomContributor();
 		const projectName = (await this.getInitState()).title
@@ -147,7 +147,7 @@ export default class FundingPool {
 			"ticker": "KOINFT",
 			"balances": {},
 			// "owner": tokenHolder,
-			"maxSupply": 100, //used to allow fractional shares without stepping into decimal territory
+			"maxSupply": 1, // used to allow fractional shares without stepping into decimal territory
 			"contentType": "application/json",
 			"transferable": transferable,
 			"lockTime": lockTime,
@@ -161,7 +161,13 @@ export default class FundingPool {
 		tags.push({ name: "Artefact-Series", value: this.artefactSeries })
 		tags.push({ name: "Pool-Id", value: this.getPoolId() })
 		tags.push({ name: "Initial-Owner", value: tokenHolder })
-		return { tags, initialState };
+		// redstone emulation tags
+		// tags.push({ name: "App-Name", value: "SmartWeaveContract" })
+		// tags.push({ name: "App-Version", value: "0.3.0" })
+		// tags.push({ name: "Contract-Src", value: this.nftContractSrc })
+		// tags.push({ name: "SDK", value: "RedStone" })
+		// tags.push({ name: "Init-State", value: JSON.stringify(initialState) })
+		return { tags, initState: initialState }
 	}
 
 }

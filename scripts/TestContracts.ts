@@ -245,11 +245,12 @@ async function runTests() {
 
 	console.log({ state: await nftContractInteractor.readState() })
 
-	await nftContractInteractor.writeInteraction({
+	const interaction = await nftContractInteractor.writeInteraction({
 		function: "transfer",
 		target: dg, qty: 0.9
 	});
 	await mine()
+	console.log(interaction)
 	console.log({ state: await nftContractInteractor.readState() })
 
 	console.log({
